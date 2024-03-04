@@ -1,6 +1,7 @@
 import { ShoppingCart } from '@mui/icons-material'
 import { AppBar, Badge, Box, FormControlLabel, IconButton, List, ListItem, Switch, Toolbar, Typography, styled } from '@mui/material'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
+import { useStoreContext } from '../context/StoreContext'
 
 const midLinks = [
   { title: 'catalog', path: '/catalog' },
@@ -12,6 +13,18 @@ const rightLinks = [
   { title: 'login', path: '/login' },
   { title: 'register', path: '/register' }
 ]
+
+const navStyles = {
+  color: 'inherit',
+  textDecoration: 'none',
+  typography: 'h6',
+  '&:hover': {
+    color: 'grey.500'
+  },
+  '&:active': {
+    color: 'text.secondary'
+  }
+}
 
 interface Props {
   darkMode: boolean
@@ -61,49 +74,33 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
   }
 }))
 
-const navStyles = { 
-  color: 'inherit',
-  textDecoration: 'none', 
-  typography: 'h6',
-  '&:hover': {
-    color: 'grey.500'
-  },
-  '&:active': {
-    color: 'text.secondary'
-  } 
-}
-
 export default function Header({ darkMode, handleThemeChange }: Props) {
+  const {basket} = useStoreContext();
+  const itemCount = basket?.items.reduce((sum, item) => sum + item.quantity, 0)
+
   return (
     <>
       <AppBar position='static' sx={{ mb: 4 }}>
-        <Toolbar sx={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-          
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Box display='flex' alignItems='center'>
-            <Typography variant='h6' component={NavLink} 
-              to='/'
-              sx={navStyles}
-              >RE-STORE</Typography>
+            <Typography variant='h6' component={NavLink} to='/' sx={navStyles}>
+              RE-STORE
+            </Typography>
             {/* <Switch checked={darkMode} onChange={handleThemeChange}/> */}
             <FormControlLabel control={<MaterialUISwitch sx={{ m: 2 }} checked={darkMode} onChange={handleThemeChange} />} label='' />
           </Box>
-          
+
           <List sx={{ display: 'flex' }}>
             {midLinks.map(({ title, path }) => (
-              <ListItem 
-                component={NavLink} 
-                to={path} 
-                key={path} 
-                sx={navStyles}
-                >
+              <ListItem component={NavLink} to={path} key={path} sx={navStyles}>
                 {title.toUpperCase()}
               </ListItem>
             ))}
           </List>
 
           <Box display='flex' alignItems='center'>
-            <IconButton size='large' edge='start' color='inherit' sx={{ mr: 2 }}>
-              <Badge badgeContent='4' color='secondary'>
+            <IconButton component={Link} to='/basket' size='large' edge='start' color='inherit' sx={{ mr: 2 }}>
+              <Badge badgeContent={itemCount} color='secondary'>
                 <ShoppingCart />
               </Badge>
             </IconButton>
@@ -115,7 +112,6 @@ export default function Header({ darkMode, handleThemeChange }: Props) {
               ))}
             </List>
           </Box>
-
         </Toolbar>
       </AppBar>
     </>
